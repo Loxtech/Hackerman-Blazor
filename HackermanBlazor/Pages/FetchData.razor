@@ -1,0 +1,81 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Students</PageTitle>
+
+@using HackermanBlazor.Data
+
+<h1>Students</h1>
+
+<p>This component is fetching data from Hackerman Database</p>
+
+@if (students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>City</th>
+                <th>Road</th>
+                <th>Hobby</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+                <tr>
+                    <td>@student.Id</td>
+                    <td>@student.FirstName</td>
+                    <td>@student.LastName</td>
+                    <td>@student.Age</td>
+                    <td>@student.City</td>
+                    <td>@student.Road</td>
+                    <td>@student.Hobby</td>
+                    <td><button class="btn btn-danger" @onclick="@(e => this.deleteRow(student.Id))">DELETE</button></td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td><input type="text" placeholder="First Name..." @bind="st.FirstName"></td>
+                <td><input type="text" placeholder="Last Name..." @bind="st.LastName"></td>
+                <td><input type="text" placeholder="Age..." @bind="st.Age"></td>
+                <td><input type="text" placeholder="City..." @bind="st.City"></td>
+                <td><input type="text" placeholder="Road..." @bind="st.Road"></td>
+                <td><input type="text" placeholder="Hobby..." @bind="st.Hobby"></td>
+                <td><button class="btn btn-success" @onclick="AddNewStudent">ADD</button></td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+    Students? st = new();
+    private List<Students>? students = new StudentService().ReadStudents("SELECT * FROM Students");
+
+    private void deleteRow(int id)
+    {
+        StudentService StudentService = new();
+        StudentService.deleteRow(id);
+        students.Remove(students.Find(x => x.Id == id));
+    }
+
+    private void AddNewStudent()
+    {
+        new StudentService().CreateStudents(st);
+        st = new();
+        GetList();
+    }
+    private void GetList()
+    {
+        students = new StudentService().ReadStudents("SELECT * FROM Students");
+
+    }
+}
+   
